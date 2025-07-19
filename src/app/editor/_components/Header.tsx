@@ -78,6 +78,7 @@ async function Header() {
                 Snippets
               </span>
             </Link>
+            {/* Enhanced CodingBuddy component with AI chat functionality */}
             <CodingBuddy />
           </nav>
         </div>
