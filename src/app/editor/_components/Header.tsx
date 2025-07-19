@@ -10,6 +10,7 @@ import RunButton from "./RunButton";
 import HeaderProfileBtn from "./HeaderProfileBtn";
 import Image from "next/image";
 import CodingBuddy from "./CodingBuddy";
+import CodingBuddy from "./CodingBuddy";
 
 async function Header() {
   const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
@@ -78,6 +79,8 @@ async function Header() {
                 Snippets
               </span>
             </Link>
+            {/* Enhanced CodingBuddy component with AI chat functionality */}
+            <CodingBuddy />
             {/* Enhanced CodingBuddy component with AI chat functionality */}
             <CodingBuddy />
           </nav>
