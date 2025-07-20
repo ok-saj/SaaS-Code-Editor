@@ -1,14 +1,14 @@
-// Rate limiting utilities for API endpoints
-// Implements daily rate limiting with configurable limits per identifier (user/IP)
+// Rate limiting utilities specifically for Gemini API usage
+// Implements daily rate limiting of 10 Gemini API calls per identifier (user/IP)
 
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
-// Configuration: Daily rate limit
+// Configuration: Daily rate limit for Gemini API calls only
 const DAILY_RATE_LIMIT = 10;
 
 /**
- * Check if a request should be rate limited
+ * Check if a Gemini API request should be rate limited
  * @param identifier - User ID or IP address
  * @returns Object with isAllowed boolean and remaining requests count
  */
@@ -52,7 +52,7 @@ export const checkRateLimit = mutation({
         isAllowed: false,
         remaining: 0,
         resetTime: getEndOfDayTimestamp(),
-        message: `Daily rate limit of ${DAILY_RATE_LIMIT} requests exceeded. Try again tomorrow.`,
+        message: `Daily Gemini API limit of ${DAILY_RATE_LIMIT} requests exceeded. Try again tomorrow.`,
       };
     }
 
@@ -71,7 +71,7 @@ export const checkRateLimit = mutation({
 });
 
 /**
- * Get current rate limit status for an identifier (read-only)
+ * Get current Gemini API rate limit status for an identifier (read-only)
  */
 export const getRateLimitStatus = query({
   args: {

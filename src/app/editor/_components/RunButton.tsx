@@ -14,28 +14,7 @@ function RunButton() {
   const saveExecution = useMutation(api.codeExecutions.saveExecution);
 
   const handleRun = async () => {
-    // RATE LIMITING: Check rate limit before running code
-    if (user) {
-      try {
-        const rateLimitCheck = await fetch('/api/rate-limit-check', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${user.id}`,
-          },
-        });
-
-        if (rateLimitCheck.status === 429) {
-          const rateLimitData = await rateLimitCheck.json();
-          toast.error(`Rate limit exceeded: ${rateLimitData.message}`);
-          return;
-        }
-      } catch (error) {
-        console.log("Rate limit check failed:", error);
-        // Continue with execution if rate limit check fails
-      }
-    }
-
+    // NO RATE LIMITING: Code execution is not rate limited, only Gemini API calls are
     await runCode();
     const result = getExecutionResult();
 

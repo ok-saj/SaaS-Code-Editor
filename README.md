@@ -24,32 +24,32 @@
 ## Demo link:- https://codenexta.vercel.app/
 
 
-## Rate Limiting
+## Gemini API Rate Limiting
 
-The application implements daily rate limiting to prevent abuse:
+The application implements daily rate limiting specifically for Gemini API usage to prevent abuse:
 
-- **Daily Limit**: 10 API requests per user/IP address per day
-- **Scope**: Applies to webhook endpoints and code execution
+- **Daily Limit**: 10 Gemini API requests per user/IP address per day
+- **Scope**: Applies only to AI-powered features (Coding Buddy and Error Fixing)
 - **Reset**: Limits reset at midnight UTC each day
 - **Headers**: Rate limit information is provided in response headers:
   - `X-RateLimit-Limit`: Maximum requests per day (10)
   - `X-RateLimit-Remaining`: Remaining requests for today
   - `X-RateLimit-Reset`: Timestamp when limit resets
 
-### Rate Limiting Endpoints
+### Gemini API Rate Limiting Endpoints
 
-- `GET /rate-limit-status` - Check current rate limit status
+- `GET /gemini-rate-limit-status` - Check current Gemini API rate limit status
 - Rate limiting is automatically applied to:
-  - `/lemon-squeezy-webhook`
-  - `/clerk-webhook` 
-  - Code execution (via client-side check)
+  - AI Coding Buddy conversations
+  - AI-powered error fixing feature
+  - **NOT applied to**: Code execution, webhooks, or other API endpoints
 
 ### Database Schema
 
-Rate limiting data is stored in the `rateLimits` table:
+Gemini API rate limiting data is stored in the `rateLimits` table:
 - `identifier`: User ID or IP address
 - `date`: Date in YYYY-MM-DD format
-- `requestCount`: Number of requests made today
+- `requestCount`: Number of Gemini API requests made today
 - `lastRequestTime`: Timestamp of last request
 
 ---

@@ -9,11 +9,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { CodeBlock, Message } from '@/types';
 import AIMessage from './AIMessage';
+import { useUser } from '@clerk/nextjs';
 
 
 const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY!);
 
 function CodingBuddy() {
+  const { user } = useUser();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
@@ -74,6 +76,28 @@ function CodingBuddy() {
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
+
+    // RATE LIMITING: Check Gemini API rate limit before making request
+    if (user) {
+      try {
+        const rateLimitCheck = await fetch('/api/gemini-rate-limit-check', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.id}`,
+          },
+        });
+
+        if (rateLimitCheck.status === 429) {
+          const rateLimitData = await rateLimitCheck.json();
+          toast.error(`Gemini API limit exceeded: ${rateLimitData.message}`);
+          return;
+        }
+      } catch (error) {
+        console.log("Gemini API rate limit check failed:", error);
+        // Continue with execution if rate limit check fails
+      }
+    }
 
     const userMessage: Message = {
       id: Date.now().toString(),

@@ -9,6 +9,7 @@ import { SignedIn, SignedOut } from "@clerk/nextjs";
 import LoginButton from "@/components/LoginButton";
 import { Button } from "@/components/ui/button";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { useUser } from "@clerk/nextjs";
 
 
 
@@ -16,6 +17,7 @@ const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY!);
 
 
 function OutputPanel() {
+  const { user } = useUser();
   const { output, error, isRunning, editor } = useCodeEditorStore();
   const [isCopied, setIsCopied] = useState(false);
   const [isAIruning, setIsAIruning] = useState(false);
@@ -35,6 +37,29 @@ function OutputPanel() {
 
   const handleAIforError = async () => {
     if (!hasContent) return;
+    
+    // RATE LIMITING: Check Gemini API rate limit before making request
+    if (user) {
+      try {
+        const rateLimitCheck = await fetch('/api/gemini-rate-limit-check', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.id}`,
+          },
+        });
+
+        if (rateLimitCheck.status === 429) {
+          const rateLimitData = await rateLimitCheck.json();
+          toast.error(`Gemini API limit exceeded: ${rateLimitData.message}`);
+          return;
+        }
+      } catch (error) {
+        console.log("Gemini API rate limit check failed:", error);
+        // Continue with execution if rate limit check fails
+      }
+    }
+    
     setIsAIruning(true);
     setAiFixComplete(false);
 

@@ -1,5 +1,5 @@
-// API route to check rate limits for code execution
-// This provides a client-side way to check rate limits before executing code
+// API route to check rate limits for Gemini API usage only
+// This provides a client-side way to check Gemini API rate limits before making AI requests
 
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -20,14 +20,14 @@ export async function POST(request: NextRequest) {
       identifier = forwardedFor || realIP || 'unknown-ip';
     }
 
-    // RATE LIMITING: Make request to Convex HTTP endpoint to check rate limit
+    // RATE LIMITING: Make request to Convex HTTP endpoint to check Gemini API rate limit
     const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
     if (!convexUrl) {
       throw new Error('CONVEX_URL not configured');
     }
 
-    // Call the rate limit status endpoint
-    const rateLimitResponse = await fetch(`${convexUrl.replace('/api', '')}/rate-limit-status`, {
+    // Call the Gemini API rate limit status endpoint
+    const rateLimitResponse = await fetch(`${convexUrl.replace('/api', '')}/gemini-rate-limit-status`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${identifier}`,
@@ -38,12 +38,12 @@ export async function POST(request: NextRequest) {
 
     const rateLimitData = await rateLimitResponse.json();
 
-    // Check if rate limit would be exceeded
+    // Check if Gemini API rate limit would be exceeded
     if (rateLimitData.remaining <= 0) {
       return NextResponse.json(
         {
-          error: 'Rate limit exceeded',
-          message: `Daily rate limit of ${rateLimitData.dailyLimit} requests exceeded. Try again tomorrow.`,
+          error: 'Gemini API rate limit exceeded',
+          message: `Daily Gemini API limit of ${rateLimitData.dailyLimit} requests exceeded. Try again tomorrow.`,
           resetTime: rateLimitData.resetTime,
         },
         { 
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Rate limit check error:', error);
+    console.error('Gemini API rate limit check error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -73,6 +73,6 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  // GET endpoint to check current rate limit status
+  // GET endpoint to check current Gemini API rate limit status
   return POST(request);
 }
