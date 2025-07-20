@@ -52,4 +52,12 @@ export default defineSchema({
       content: v.string(),
   }).index("by_user_id", ["userId"])
     .index("by_rating", ["rating"]),
+
+  // Rate limiting table to track API usage per user/IP per day
+  rateLimits: defineTable({
+    identifier: v.string(), // userId or IP address
+    date: v.string(), // YYYY-MM-DD format
+    requestCount: v.number(),
+    lastRequestTime: v.number(), // timestamp
+  }).index("by_identifier_and_date", ["identifier", "date"]),
 });
